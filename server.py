@@ -23,7 +23,7 @@ s.bind((host, port))
 s.listen(5)
 
 clients = []
-usernames = []
+usernames = ['[+] SYSTEM MESSAGE [+]']
 
 BUFF_SIZE = 1024*1024
 
@@ -39,7 +39,7 @@ def start_new_client(conn, addr):
     conn.recv(BUFF_SIZE)
     print(f'[+] SYSTEM MESSAGE [+]: {name} was been connected! {addr}')
     write_log(f'[+] SYSTEM MESSAGE [+]: {name} was been connected! {addr}\n')
-    send2all_clients(pickle.dumps({'message': f'[+] SYSTEM MESSAGE [+]: {name} was been connected!', 'online': f'{len(usernames)}'}))
+    send2all_clients(pickle.dumps({'message': f'[+] SYSTEM MESSAGE [+]: {name} was been connected!', 'online': f'{len(clients)}'}))
     while True:
         try:
             message = conn.recv(BUFF_SIZE).decode('utf8')
@@ -47,7 +47,7 @@ def start_new_client(conn, addr):
                 break
             print(f'[+] MESSAGE [+]: {name}: {message}')
             write_log(f'[+] MESSAGE [+]: {name}: {message}\n')
-            send2all_clients(pickle.dumps({'message': f'{name}: {message}', 'online': f'{len(usernames)}'}))
+            send2all_clients(pickle.dumps({'message': f'{name}: {message}', 'online': f'{len(clients)}'}))
         except:
             break
     clients.remove(conn)
@@ -55,7 +55,7 @@ def start_new_client(conn, addr):
     conn.close()
     print(f'[+] SYSTEM MESSAGE [+]: {name} leave!')
     write_log(f'[+] SYSTEM MESSAGE [+]: {name} leave!\n')
-    send2all_clients(pickle.dumps({'message': f'[+] SYSTEM MESSAGE [+]: {name} leave!', 'online': f'{len(usernames)}'}))
+    send2all_clients(pickle.dumps({'message': f'[+] SYSTEM MESSAGE [+]: {name} leave!', 'online': f'{len(clients)}'}))
 
 while True:
     conn, addr = s.accept()
