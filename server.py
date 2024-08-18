@@ -46,7 +46,7 @@ def start_new_client(conn, addr):
             print(f'[+] MESSAGE [+]: {name}: {message}')
             write_log(f'[+] MESSAGE [+]: {name}: {message}\n')
             for client in clients:
-                data = pickle.dumps({'message': f'[+] SYSTEM MESSAGE [+]: {name} was been connected!', 'online': f'{len(usernames)}'})
+                data = pickle.dumps({'message': f'{name}: {message}', 'online': f'{len(usernames)}'})
                 client.sendall(data)
         except:
             break
@@ -56,7 +56,7 @@ def start_new_client(conn, addr):
     print(f'[+] SYSTEM MESSAGE [+]: {name} leave!')
     write_log(f'[+] SYSTEM MESSAGE [+]: {name} leave!\n')
     for client in clients:
-        data = pickle.dumps({'message': f'[+] SYSTEM MESSAGE [+]: {name} was been connected!', 'online': f'{len(usernames)}'})
+        data = pickle.dumps({'message': f'[+] SYSTEM MESSAGE [+]: {name} leave!', 'online': f'{len(usernames)}'})
         client.sendall(data)
 
 
