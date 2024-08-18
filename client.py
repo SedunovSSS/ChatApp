@@ -59,7 +59,6 @@ def recipe():
     while True:
         try:
             r = s.recv(BUFF_SIZE)
-            print(pickle.loads(r))
             if r:
                 r = pickle.loads(r)
                 # print(r)
