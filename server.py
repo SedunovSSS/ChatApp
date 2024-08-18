@@ -8,6 +8,10 @@ def write_log(log):
     log_file.write(log)
     log_file.close()
 
+def send2all_clients(why_send):
+    for client in clients:
+        client.sendall(why_send)
+
 s = socket.socket() 
 
 host_data = json.load(open('host.json'))
@@ -35,9 +39,7 @@ def start_new_client(conn, addr):
     conn.recv(BUFF_SIZE)
     print(f'[+] SYSTEM MESSAGE [+]: {name} was been connected! {addr}')
     write_log(f'[+] SYSTEM MESSAGE [+]: {name} was been connected! {addr}\n')
-    for client in clients:
-        data = pickle.dumps({'message': f'[+] SYSTEM MESSAGE [+]: {name} was been connected!', 'online': f'{len(usernames)}'})
-        client.sendall(data)
+    send2all_clients(pickle.dumps({'message': f'[+] SYSTEM MESSAGE [+]: {name} was been connected!', 'online': f'{len(usernames)}'}))
     while True:
         try:
             message = conn.recv(BUFF_SIZE).decode('utf8')
@@ -45,9 +47,7 @@ def start_new_client(conn, addr):
                 break
             print(f'[+] MESSAGE [+]: {name}: {message}')
             write_log(f'[+] MESSAGE [+]: {name}: {message}\n')
-            for client in clients:
-                data = pickle.dumps({'message': f'{name}: {message}', 'online': f'{len(usernames)}'})
-                client.sendall(data)
+            send2all_clients(pickle.dumps({'message': f'{name}: {message}', 'online': f'{len(usernames)}'}))
         except:
             break
     clients.remove(conn)
@@ -55,10 +55,7 @@ def start_new_client(conn, addr):
     conn.close()
     print(f'[+] SYSTEM MESSAGE [+]: {name} leave!')
     write_log(f'[+] SYSTEM MESSAGE [+]: {name} leave!\n')
-    for client in clients:
-        data = pickle.dumps({'message': f'[+] SYSTEM MESSAGE [+]: {name} leave!', 'online': f'{len(usernames)}'})
-        client.sendall(data)
-
+    send2all_clients(pickle.dumps({'message': f'[+] SYSTEM MESSAGE [+]: {name} leave!', 'online': f'{len(usernames)}'}))
 
 while True:
     conn, addr = s.accept()
