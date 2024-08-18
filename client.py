@@ -4,10 +4,15 @@ from tkinter import ttk
 import threading
 import sys
 from playsound import playsound
+import json
+import pickle
 
 s = socket.socket() 
-host = '127.0.0.1'
-port = 1488
+
+host_data = json.load(open('host.json'))
+
+host = host_data['HOST']
+port = host_data["PORT"]
 
 s.connect((host, port))
 
@@ -16,12 +21,13 @@ root.title('Login Form')
 root.iconbitmap('icons/icon.ico')
 
 total_name = None
+BUFF_SIZE = 1024*1024
 
 def login():
     global total_name
     name = ent.get()
     s.send(name.encode('utf8'))
-    if s.recv(1024).decode('utf8') == 'success':
+    if s.recv(BUFF_SIZE).decode('utf8') == 'success':
         total_name = name
         root.destroy()
         s.send(' '.encode('utf8'))
@@ -52,13 +58,17 @@ def send_message():
 def recipe():
     while True:
         try:
-            r = s.recv(1024)
+            r = s.recv(BUFF_SIZE)
+            print(pickle.loads(r))
             if r:
-                r = r.decode('utf8')
+                r = pickle.loads(r)
                 # print(r)
-                listbox.insert(END, r)
+                listbox.insert(END, r['message'])
                 listbox.yview(END)
-                s_name = r.split(': ')[0]
+
+                online_label.config(text=f"Online: {r['online']}")
+
+                s_name = r['message'].split(': ')[0]
                 if s_name != total_name and s_name != '[+] SYSTEM MESSAGE [+]':
                     playsound('sounds/sound.mp3')
         except:
@@ -79,6 +89,9 @@ ent.pack(side="left")
 
 btn = Button(f, text='send', command=send_message, bg='black', fg='white')
 btn.pack(side="right")
+
+online_label = Label(text='Online: ?', fg='blue')
+online_label.pack(side='bottom')
 
 scrollbar = ttk.Scrollbar(root)
 scrollbar.pack(side="right", fill="y")
